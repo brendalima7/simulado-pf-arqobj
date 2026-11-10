@@ -8,6 +8,7 @@ import simulado.pf.arqobjet.common.RegraNegocioException;
 import simulado.pf.arqobjet.projeto.Projeto;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DepartamentoService {
@@ -25,9 +26,13 @@ public class DepartamentoService {
     }
 
     public Departamento buscarPorId(int id) {
-        return departamentoRepository
-                .findById(id)
-                .orElseThrow(() -> new NaoEncontradoException("Departamento não encontrado"));
+        Optional<Departamento> departamento = departamentoRepository.findById(id);
+
+        if (departamento.isEmpty()) {
+            throw new NaoEncontradoException("Departamento não encontrado");
+        }
+
+        return departamento.get();
     }
 
     @Transactional
@@ -46,8 +51,8 @@ public class DepartamentoService {
         departamentoRepository.delete(departamento);
     }
 
-    @Transactional(readOnly = true)
     public List<Projeto> listarProjetos(int id) {
-        return List.copyOf(buscarPorId(id).getProjetos());
+        Departamento departamento = buscarPorId(id);
+        return departamento.getProjetos();
     }
 }

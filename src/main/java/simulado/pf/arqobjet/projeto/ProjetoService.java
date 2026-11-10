@@ -12,6 +12,7 @@ import simulado.pf.arqobjet.pessoa.PessoaService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProjetoService {
@@ -42,9 +43,13 @@ public class ProjetoService {
     }
 
     public Projeto buscarPorId(int id) {
-        return projetoRepository
-                .findById(id)
-                .orElseThrow(() -> new NaoEncontradoException("Projeto não encontrado"));
+        Optional<Projeto> projeto = projetoRepository.findById(id);
+
+        if (projeto.isEmpty()) {
+            throw new NaoEncontradoException("Projeto não encontrado");
+        }
+
+        return projeto.get();
     }
 
     @Transactional

@@ -9,6 +9,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import simulado.pf.arqobjet.common.RegraNegocioException;
 
+import java.util.Optional;
+
 @Service
 public class UsuarioService implements UserDetailsService {
 
@@ -34,8 +36,13 @@ public class UsuarioService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        User user = usuarioRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+        Optional<User> usuario = usuarioRepository.findByEmail(username);
+
+        if (usuario.isEmpty()) {
+            throw new UsernameNotFoundException("Usuário não encontrado");
+        }
+
+        User user = usuario.get();
 
         return org.springframework.security.core.userdetails.User
                 .builder()
